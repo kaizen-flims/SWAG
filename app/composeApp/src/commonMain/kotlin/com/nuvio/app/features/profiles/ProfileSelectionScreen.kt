@@ -66,7 +66,7 @@ import com.nuvio.app.core.ui.NuvioBackButton
 import com.nuvio.app.core.ui.NuvioToastHost
 import com.nuvio.app.core.ui.LocalVerticalBarPadding
 import com.nuvio.app.features.membership.CosmeticEntitlement
-import com.nuvio.app.features.settings.AppBrandWordmark
+import com.nuvio.app.features.settings.AppBrandLogo
 import com.nuvio.app.features.settings.SupporterBadgeIfPresent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -216,7 +216,7 @@ fun ProfileSelectionScreen(
                 // wordmark and the Supporter badge next to it both stay fully visible through the
                 // tap→center transition, while everything underneath fades away.
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    AppBrandWordmark(
+                    AppBrandLogo(
                         modifier = Modifier
                             .height(if (isTabletLayout) 42.dp else 34.dp)
                             .graphicsLayer {
