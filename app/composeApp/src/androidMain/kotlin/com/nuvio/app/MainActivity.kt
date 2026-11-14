@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.remember
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.nuvio.app.core.auth.AuthStorage
+import com.nuvio.app.core.logging.InAppLogger
 import com.nuvio.app.core.network.ServerConfigurationStorage
 import com.nuvio.app.core.diagnostics.SentryInitializer
 import com.nuvio.app.core.deeplink.handleAppUrl
@@ -96,6 +97,7 @@ import com.nuvio.app.features.watchprogress.WatchProgressStorage
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 open class MainActivity : AppCompatActivity() {
     private val startupScope = MainScope()
@@ -199,7 +201,26 @@ open class MainActivity : AppCompatActivity() {
             showContent()
         } else {
             startupScope.launch {
-                StartupPreloader.awaitReady()
+                // Never leave the Android splash screen up forever if a cached
+                // repository or local database stalls during startup.
+                val preloadCompleted = runCatching {
+                    withTimeoutOrNull(12_000L) {
+                        StartupPreloader.awaitReady()
+                        true
+                    } ?: false
+                }.onFailure { error ->
+                    InAppLogger.warn(
+                        "App/Startup",
+                        "startup preload failed: ${error::class.simpleName}: ${error.message}",
+                    )
+                }.getOrDefault(false)
+
+                if (!preloadCompleted) {
+                    InAppLogger.warn(
+                        "App/Startup",
+                        "showing app after startup preload timeout or failure",
+                    )
+                }
                 if (!isFinishing && !isDestroyed) showContent()
             }
         }
