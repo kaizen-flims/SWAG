@@ -170,7 +170,10 @@ abstract class CargoNdkBuild @Inject constructor(private val exec: ExecOperation
         }
         exec.exec {
             workingDir = workspace.get().asFile
-            environment("ANDROID_NDK_HOME", ndk.get().asFile.path)
+            val selectedNdk = ndk.get().asFile.path
+            // Keep cargo-ndk on the same NDK selected by the Android Gradle Plugin.
+            environment("ANDROID_NDK_HOME", selectedNdk)
+            environment("ANDROID_NDK_ROOT", selectedNdk)
             commandLine(
                 listOf(cargo(), "ndk", "--platform", minSdk.get().toString()) +
                     abis.get().flatMap { listOf("-t", it) } +
