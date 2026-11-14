@@ -299,6 +299,10 @@ tasks.withType<KotlinCompilationTask<*>>().configureEach {
     dependsOn(generateRuntimeConfigs)
 }
 
+composeResources {
+    packageOfResClass = "nuvio.composeapp.generated.resources"
+}
+
 composeCompiler {
     stabilityConfigurationFiles.add(layout.projectDirectory.file("compose-stability.conf"))
     if (providers.gradleProperty("nuvio.composeCompilerReports").map(String::toBoolean).getOrElse(false)) {
