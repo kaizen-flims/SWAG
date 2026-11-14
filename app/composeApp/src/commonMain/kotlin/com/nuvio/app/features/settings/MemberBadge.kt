@@ -74,7 +74,7 @@ internal fun MemberTier.badgeStyle(): MemberBadgeStyle = when (this) {
 }
 
 /**
- * Just the "Supporter"/"Supporter+" badge, with no wordmark alongside it — split out of
+ * Just the "Supporter"/"Supporter+" badge, without adding a separate text wordmark — split out of
  * [AppBrandLogo] so screens that need to fade the rest of their header away (see the
  * profile-select → center transition in ProfileSelectionScreen) can keep this piece visible on
  * its own, independent of whatever alpha the brand logo next to it is animating through.
