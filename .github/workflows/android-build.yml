@@ -30,16 +30,22 @@ jobs:
           java-version: "17"
 
       - name: Set up Rust
-        uses: actions-rust-lang/setup-rust-toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Install cargo-ndk
         run: cargo install cargo-ndk --locked
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager --version
-          yes | sdkmanager --licenses || true
-          sdkmanager --install \
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$(find "$SDK_ROOT/cmdline-tools" -type f -name sdkmanager | sort -V | tail -n 1)"
+          if [ -z "$SDKMANAGER" ]; then
+            echo "Android SDK command-line tools were not found under $SDK_ROOT" >&2
+            exit 1
+          fi
+          "$SDKMANAGER" --version
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install \
             "platform-tools" \
             "platforms;android-37" \
             "build-tools;37.0.0" \
