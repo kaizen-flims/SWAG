@@ -51,6 +51,22 @@ class PluginPersistenceTest {
     }
 
     @Test
+    fun defaultRepositorySeedMarkerSurvivesPersistenceRoundTrip() {
+        val stored = PluginsUiState().toStoredPluginsState().copy(defaultRepositorySeeded = true)
+
+        val decoded = json.decodeFromString<StoredPluginsState>(json.encodeToString(stored))
+
+        assertTrue(decoded.defaultRepositorySeeded)
+    }
+
+    @Test
+    fun legacyStoredStateDefaultsDefaultRepositorySeedMarkerToFalse() {
+        val decoded = json.decodeFromString<StoredPluginsState>("{}")
+
+        assertFalse(decoded.defaultRepositorySeeded)
+    }
+
+    @Test
     fun cachedScraperCodeRestoresOfflineWithoutMigration() {
         val sourceCode = "offline scraper source"
         val stored = pluginScraper(sourceCode).toStoredPluginScraper()

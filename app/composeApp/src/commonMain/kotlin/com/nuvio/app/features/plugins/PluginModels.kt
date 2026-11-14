@@ -115,6 +115,7 @@ internal data class StoredPluginsState(
     val groupStreamsByRepository: Boolean = false,
     val repositories: List<StoredPluginRepository> = emptyList(),
     val scrapers: List<StoredPluginScraper> = emptyList(),
+    val defaultRepositorySeeded: Boolean = false,
 )
 
 @Serializable

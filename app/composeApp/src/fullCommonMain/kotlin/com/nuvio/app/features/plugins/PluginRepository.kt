@@ -1,6 +1,8 @@
 package com.nuvio.app.features.plugins
 
 import co.touchlab.kermit.Logger
+import com.nuvio.app.core.auth.AuthRepository
+import com.nuvio.app.core.auth.AuthState
 import com.nuvio.app.core.network.SupabaseProvider
 import com.nuvio.app.features.addons.httpGetText
 import com.nuvio.app.features.profiles.ProfileRepository
@@ -19,6 +21,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -60,6 +63,7 @@ private data class PluginPersistenceSnapshot(
     val generation: Long,
     val revision: Long,
     val state: PluginsUiState,
+    val defaultRepositorySeeded: Boolean,
 )
 
 private data class LoadedPluginState(
@@ -68,6 +72,9 @@ private data class LoadedPluginState(
 )
 
 actual object PluginRepository {
+    private const val DEFAULT_PLUGIN_REPOSITORY_URL =
+        "https://raw.githubusercontent.com/D3adlyRocket/All-in-One-Nuvio/refs/heads/main/manifest.json"
+
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val log = Logger.withTag("PluginRepository")
     private val json = Json { ignoreUnknownKeys = true; encodeDefaults = true }
@@ -77,6 +84,8 @@ actual object PluginRepository {
 
     private var initialized = false
     private var currentProfileId = 1
+    private var defaultRepositorySeeded = false
+    private var defaultRepositorySeedJob: Job? = null
     private val activeRefreshJobs = mutableMapOf<String, Job>()
     private val activeRefreshJobsLock = SynchronizedObject()
     private val persistenceGeneration = atomic(0L)
@@ -88,6 +97,7 @@ actual object PluginRepository {
         val effectiveProfileId = resolveEffectiveProfileId(ProfileRepository.activeProfileId)
         val shouldRefreshStoredRepos = !initialized || currentProfileId != effectiveProfileId
         ensureStateLoadedForProfile(effectiveProfileId)
+        scheduleDefaultRepositorySeed(effectiveProfileId)
         if (!shouldRefreshStoredRepos) return
 
         val state = _uiState.value
@@ -104,6 +114,9 @@ actual object PluginRepository {
         if (effectiveProfileId == currentProfileId && initialized) return
 
         cancelActiveRefreshes()
+        defaultRepositorySeedJob?.cancel()
+        defaultRepositorySeedJob = null
+        defaultRepositorySeeded = false
         currentProfileId = effectiveProfileId
         initialized = false
         _uiState.value = PluginsUiState()
@@ -111,6 +124,9 @@ actual object PluginRepository {
 
     actual fun clearLocalState() {
         cancelActiveRefreshes()
+        defaultRepositorySeedJob?.cancel()
+        defaultRepositorySeedJob = null
+        defaultRepositorySeeded = false
         persistenceGeneration.incrementAndGet()
         currentProfileId = 1
         initialized = false
@@ -173,6 +189,11 @@ actual object PluginRepository {
         }.onFailure { error ->
             log.e(error) { "pullFromServer failed" }
         }
+
+        val authState = AuthRepository.state.value
+        if (authState is AuthState.Authenticated && !authState.isAnonymous) {
+            ensureDefaultRepositoryInstalled(effectiveProfileId)
+        }
     }
 
     actual suspend fun addRepository(rawUrl: String): AddPluginRepositoryResult {
@@ -199,6 +220,9 @@ actual object PluginRepository {
                     scrapers = state.scrapers.filterNot { it.repositoryUrl == manifestUrl } + scrapers,
                 )
             }
+            if (manifestUrl == DEFAULT_PLUGIN_REPOSITORY_URL) {
+                defaultRepositorySeeded = true
+            }
             persist()
             pushToServer()
             AddPluginRepositoryResult.Success(repo)
@@ -209,6 +233,11 @@ actual object PluginRepository {
 
     actual fun removeRepository(manifestUrl: String) {
         initialize()
+        if (manifestUrl == DEFAULT_PLUGIN_REPOSITORY_URL) {
+            defaultRepositorySeeded = true
+            defaultRepositorySeedJob?.cancel()
+            defaultRepositorySeedJob = null
+        }
         _uiState.update { state ->
             state.copy(
                 repositories = state.repositories.filterNot { it.manifestUrl == manifestUrl },
@@ -534,6 +563,7 @@ actual object PluginRepository {
             generation = persistenceGeneration.value,
             revision = persistenceRevision.incrementAndGet(),
             state = _uiState.value,
+            defaultRepositorySeeded = defaultRepositorySeeded,
         )
         val requiresCodeWrite = snapshot.state.scrapers.any { scraper ->
             !PluginStorage.hasScraperCode(snapshot.profileId, scraper.id)
@@ -568,9 +598,40 @@ actual object PluginRepository {
             if (snapshot.generation != persistenceGeneration.value) return@synchronized
             val persistedRevision = persistedRevisionByProfile[snapshot.profileId] ?: Long.MIN_VALUE
             if (snapshot.revision < persistedRevision) return@synchronized
-            val payload = snapshot.state.toStoredPluginsState()
+            val payload = snapshot.state.toStoredPluginsState().copy(
+                defaultRepositorySeeded = snapshot.defaultRepositorySeeded,
+            )
             PluginStorage.saveState(snapshot.profileId, json.encodeToString(payload))
             persistedRevisionByProfile[snapshot.profileId] = snapshot.revision
+        }
+    }
+
+    private fun scheduleDefaultRepositorySeed(profileId: Int) {
+        if (profileId != currentProfileId || defaultRepositorySeeded) return
+        if (defaultRepositorySeedJob?.isActive == true) return
+
+        defaultRepositorySeedJob = scope.launch {
+            val authState = AuthRepository.state.first { it !is AuthState.Loading }
+            if (profileId != currentProfileId || defaultRepositorySeeded) return@launch
+            if (authState is AuthState.Authenticated && !authState.isAnonymous) return@launch
+            ensureDefaultRepositoryInstalled(profileId)
+        }
+    }
+
+    private suspend fun ensureDefaultRepositoryInstalled(profileId: Int) {
+        if (profileId != currentProfileId || defaultRepositorySeeded) return
+
+        if (_uiState.value.repositories.any { it.manifestUrl == DEFAULT_PLUGIN_REPOSITORY_URL }) {
+            defaultRepositorySeeded = true
+            persist()
+            return
+        }
+
+        when (val result = addRepository(DEFAULT_PLUGIN_REPOSITORY_URL)) {
+            is AddPluginRepositoryResult.Success ->
+                log.i { "Installed default plugin repository: ${result.repository.name}" }
+            is AddPluginRepositoryResult.Error ->
+                log.w { "Default plugin repository install deferred: ${result.message}" }
         }
     }
 
@@ -597,14 +658,19 @@ actual object PluginRepository {
         }
 
         currentProfileId = profileId
-        val loadedState = loadStateAsUiState(profileId)
+        val stored = loadStoredState(profileId)
+        defaultRepositorySeeded = stored?.defaultRepositorySeeded == true ||
+            stored?.repositories?.any { it.manifestUrl == DEFAULT_PLUGIN_REPOSITORY_URL } == true
+        val loadedState = loadStateAsUiState(profileId, stored)
         _uiState.value = loadedState.state
         initialized = true
         if (loadedState.requiresMigration) persist()
     }
 
-    private fun loadStateAsUiState(profileId: Int): LoadedPluginState {
-        val stored = loadStoredState(profileId)
+    private fun loadStateAsUiState(
+        profileId: Int,
+        stored: StoredPluginsState?,
+    ): LoadedPluginState {
         var requiresMigration = false
         val scrapers = stored?.scrapers
             ?.mapNotNull { storedScraper ->
