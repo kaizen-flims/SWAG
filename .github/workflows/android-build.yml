@@ -73,6 +73,31 @@ jobs:
         working-directory: app
         run: ./gradlew --no-daemon :androidApp:assembleFullDebug
 
+      - name: Smoke test app launch on Android emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_2
+          script: |
+            APK="$(find app/androidApp/build/outputs/apk/full/debug -name '*.apk' -print -quit)"
+            test -n "$APK"
+            adb logcat -c
+            adb install -r "$APK"
+            adb shell am force-stop com.nuviodebug.com
+            adb shell am start -W -n com.nuviodebug.com/com.nuvio.app.launcher.AppIconDefault
+            sleep 18
+            if ! adb shell pidof com.nuviodebug.com >/dev/null; then
+              adb logcat -d -t 2000 > /tmp/swag-launch-log.txt
+              grep -n -A35 -B10 'FATAL EXCEPTION' /tmp/swag-launch-log.txt || true
+              exit 1
+            fi
+            if adb logcat -d -s AndroidRuntime:E | grep -q 'FATAL EXCEPTION'; then
+              adb logcat -d -s AndroidRuntime:E
+              exit 1
+            fi
+
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
