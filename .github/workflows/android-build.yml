@@ -45,7 +45,7 @@ jobs:
           fi
           "$SDKMANAGER" --version
           yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
-          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --install \
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" --channel=3 --install \
             "platform-tools" \
             "platforms;android-37" \
             "build-tools;37.0.0" \
