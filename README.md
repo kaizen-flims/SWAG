@@ -18,12 +18,14 @@ The upstream source is licensed under GNU GPL v3.0. See `app/LICENSE` and the pr
 
 ## Local Android setup
 
-Requirements: JDK 17, Android SDK Platform 37.1, Build Tools 37.0.0, CMake 3.22.1, an Android NDK selected by the Android Gradle Plugin, Rust stable, and `cargo-ndk`.
+Requirements: JDK 17, Android SDK Platform 37.1, Build Tools 37.0.0, CMake 3.22.1, an Android NDK selected by the Android Gradle Plugin, Rust stable, `cargo-ndk`, and Python packages `cairosvg` and `Pillow` for generating Android branding assets.
 
 From the repository root, restore the pinned upstream Android libraries (the binary AARs are intentionally not committed here):
 
 ```bash
 bash scripts/restore-android-libs.sh
+python3 -m pip install cairosvg pillow
+python3 scripts/generate-android-icons.py
 rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
 cargo install cargo-ndk --locked
 ```
