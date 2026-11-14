@@ -299,7 +299,7 @@ tasks.withType<KotlinCompilationTask<*>>().configureEach {
     dependsOn(generateRuntimeConfigs)
 }
 
-composeResources {
+compose.resources {
     packageOfResClass = "nuvio.composeapp.generated.resources"
 }
 
