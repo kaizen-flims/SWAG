@@ -34,7 +34,6 @@ import com.nuvio.app.core.ui.NuvioScreenHeader
 import com.nuvio.app.features.cloud.PremiumizeCloudLibraryPosterUrl
 import com.nuvio.app.features.cloud.TorboxCloudLibraryPosterUrl
 import com.nuvio.app.features.cloud.cloudLibraryDisplayArtworkUrl
-import com.nuvio.app.isIos
 import nuvio.composeapp.generated.resources.*
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
@@ -47,8 +46,7 @@ private const val PremiumizeUrl = "https://www.premiumize.me"
 private const val TorboxUrl = "https://torbox.app"
 private const val MdbListUrl = "https://mdblist.com"
 private const val IntroDbUrl = "https://introdb.app/"
-private const val NuvioRepositoryUrl = "https://github.com/NuvioMedia/NuvioMobile"
-private const val MpvKitUrl = "https://github.com/mpvkit/MPVKit"
+private const val SwagRepositoryUrl = "https://github.com/kaizen-flims/Swag-workstation-"
 private const val ApacheLicenseUrl = "https://www.apache.org/licenses/LICENSE-2.0"
 private const val BackdropLicenseUrl = "https://github.com/Kyant0/AndroidLiquidGlass/blob/kmp/LICENSE"
 
@@ -392,22 +390,13 @@ private fun appLicenseItem(): LicenseItem =
         titleRes = Res.string.settings_licenses_attributions_nuvio_title,
         bodyRes = Res.string.settings_licenses_attributions_nuvio_body,
         licenseRes = Res.string.settings_licenses_attributions_nuvio_license,
-        link = NuvioRepositoryUrl,
+        link = SwagRepositoryUrl,
     )
 
 private fun platformLicenseItem(): LicenseItem =
-    if (isIos) {
-        LicenseItem(
-            titleRes = Res.string.settings_licenses_attributions_mpvkit_title,
-            bodyRes = Res.string.settings_licenses_attributions_mpvkit_body,
-            licenseRes = Res.string.settings_licenses_attributions_mpvkit_license,
-            link = MpvKitUrl,
-        )
-    } else {
-        LicenseItem(
-            titleRes = Res.string.settings_licenses_attributions_exoplayer_title,
-            bodyRes = Res.string.settings_licenses_attributions_exoplayer_body,
-            licenseRes = Res.string.settings_licenses_attributions_exoplayer_license,
-            link = ApacheLicenseUrl,
-        )
-    }
+    LicenseItem(
+        titleRes = Res.string.settings_licenses_attributions_exoplayer_title,
+        bodyRes = Res.string.settings_licenses_attributions_exoplayer_body,
+        licenseRes = Res.string.settings_licenses_attributions_exoplayer_license,
+        link = ApacheLicenseUrl,
+    )

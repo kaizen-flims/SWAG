@@ -1,21 +1,24 @@
 # #SWAG Workstation
 
-The active development workspace for rebuilding and rebranding #SWAG. App source, code changes, and workstation GitHub Actions workflows live here. The original `kaizen-flims/SWAG` repository is not changed by this import.
+The active Android development workspace for #SWAG. All application changes and workstation-owned GitHub Actions workflows are maintained here. The original `kaizen-flims/SWAG` repository remains untouched until a reviewed version is ready to publish.
 
 ## Repository layout
 
-- `app/`: extracted Nuvio Mobile Enhanced 0.6.12-beta project. Build commands should run from this directory.
-- `archives/nuvio-mobile-enhanced/`: original three ZIP parts, preserved unchanged as source provenance.
-- `assets/incoming/`: imported SVG awaiting visual identification.
-- `.github/workflows/`: workstation-owned automation. Upstream workflows inside `app/.github/` are nested project files and are not active in this repository.
+- `app/`: Android application source and build project.
+- `archives/nuvio-mobile-enhanced/`: original source archive parts, preserved unchanged.
+- `assets/icon.svg`: canonical #SWAG logo and wordmark supplied for the rebrand.
+- `assets/incoming/`: original imported asset staging area.
+- `.github/workflows/`: workstation automation.
 
-## Source handling
+## Upstream acknowledgements
 
-The three archive parts were concatenated in filename order and passed a ZIP CRC test before extraction. The extracted project is kept under `app/` so its original build files and upstream workflow definitions stay isolated from workstation automation.
+#SWAG is based on source from **Nuvio Mobile** and **Nuvio Mobile Enhanced**. Their original work and required license notices are retained in the source tree. #SWAG is an independent rebrand and is not affiliated with or endorsed by the Nuvio team.
+
+The upstream source is licensed under GNU GPL v3.0. See `app/LICENSE` and the preserved third-party notices for the applicable terms.
 
 ## Development rules
 
-- Preserve existing backend behavior and service endpoints during the rebrand.
-- Make and test changes in this workstation repository.
-- Keep the original `kaizen-flims/SWAG` repository untouched until a reviewed version is ready to publish.
-- Inspect upstream licensing and submodule requirements before changing or redistributing source.
+- Keep existing backend behavior, authentication, and service endpoints unchanged unless explicitly requested.
+- Make and verify changes in this workstation repository.
+- Keep upstream attribution and license notices intact.
+- Android is the active target in this workstation; iOS project and build targets have been removed.
