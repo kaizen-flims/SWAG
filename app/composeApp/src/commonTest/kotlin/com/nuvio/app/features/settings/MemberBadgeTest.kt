@@ -5,7 +5,7 @@ import com.nuvio.app.features.membership.MemberTier
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class MemberBrandWordmarkTest {
+class MemberBadgeTest {
     @Test
     fun supporterBadgeMatchesWebsiteWarmGradient() {
         val style = MemberTier.SUPPORTER.badgeStyle()
