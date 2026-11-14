@@ -72,6 +72,12 @@ for density, size in adaptive_sizes.items():
     for variant in ("_arctic_blue", "_copper", "_emerald", "_graphite", "_rose_gold"):
         save_webp(foreground, folder / f"ic_launcher{variant}_foreground.webp")
 
+# In-app branding uses the exact same mark on a transparent canvas, avoiding
+# the opaque white page background in the supplied SVG.
+brand_mark = Image.new("RGBA", mask.size, (255, 255, 255, 0))
+brand_mark.paste(Image.new("RGBA", mask.size, (255, 255, 255, 255)), (0, 0), mask)
+save_png(brand_mark, COMPOSE_DRAWABLES / "swag_icon_brand.png")
+
 # Compose icon-picker previews use the same canonical mark, not Nuvio artwork.
 preview = Image.alpha_composite(
     Image.new("RGBA", (256, 256), (8, 8, 8, 255)),
