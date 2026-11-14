@@ -6,6 +6,7 @@ on:
     paths:
       - "app/**"
       - ".github/workflows/android-build.yml"
+      - "scripts/**"
   workflow_dispatch:
 
 permissions:
@@ -32,6 +33,9 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Install Android Rust targets
+        run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+
       - name: Install cargo-ndk
         run: cargo install cargo-ndk --locked
 
@@ -53,14 +57,7 @@ jobs:
             "ndk;27.2.12479018"
 
       - name: Restore required upstream Android libraries
-        working-directory: app/composeApp
-        run: |
-          mkdir -p libs
-          UPSTREAM="https://raw.githubusercontent.com/kaizen-flims/SWAG/23afa5996ccf30c59188c769a5722b9dba9b5efe/composeApp/libs"
-          curl --fail --location --retry 3 "$UPSTREAM/nuvio-libass-release.aar" --output libs/nuvio-libass-release.aar
-          curl --fail --location --retry 3 "$UPSTREAM/quickjs-kt-android-1.0.5-nuvio.aar" --output libs/quickjs-kt-android-1.0.5-nuvio.aar
-          unzip -t libs/nuvio-libass-release.aar
-          unzip -t libs/quickjs-kt-android-1.0.5-nuvio.aar
+        run: bash scripts/restore-android-libs.sh
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
