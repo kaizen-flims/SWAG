@@ -57,6 +57,7 @@ for density, size in densities.items():
     background = Image.new("RGBA", (size, size), (8, 8, 8, 255))
     layer = logo_layer(size, 0.80)
     icon = Image.alpha_composite(background, layer).convert("RGB")
+    save_webp(icon, folder / "ic_launcher_round.webp")
     for variant in icon_variants:
         save_webp(icon, folder / f"ic_launcher{variant}.webp")
 
