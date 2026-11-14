@@ -97,7 +97,7 @@ import com.nuvio.app.core.auth.AuthRepository
 import com.nuvio.app.core.auth.DeviceLinkAuthRepository
 import com.nuvio.app.core.auth.DeviceLinkAuthState
 import com.nuvio.app.core.build.AppFeaturePolicy
-import com.nuvio.app.features.settings.AppBrandWordmark
+import com.nuvio.app.features.settings.AppBrandLogo
 import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.PI
@@ -546,7 +546,7 @@ private fun AuthLargeLayout(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.Start,
         ) {
-            AppBrandWordmark(
+            AppBrandLogo(
                 contentDescription = null,
                 modifier = Modifier.height(60.dp * scale),
             )
@@ -646,7 +646,7 @@ private fun AuthBrandLockup(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AppBrandWordmark(
+        AppBrandLogo(
             contentDescription = null,
             modifier = Modifier.height(logoHeight),
         )
