@@ -41,8 +41,8 @@ import kotlin.math.abs
 import kotlin.math.cos
 import kotlin.math.sin
 
-private const val MemberWordmarkHeightRatio = 132f / 344f
-private const val MemberWordmarkVerticalOffsetRatio = -12f / 344f
+private const val MemberBadgeFontSizeRatio = 132f / 344f
+private const val MemberBadgeVerticalOffsetRatio = -12f / 344f
 internal const val MemberBadgeGradientAngleDegrees = 100f
 internal const val MemberBadgeGradientWidthMultiplier = 2.4f
 internal const val MemberBadgeSweepHalfDurationMs = 2_750
@@ -73,29 +73,11 @@ internal fun MemberTier.badgeStyle(): MemberBadgeStyle = when (this) {
     )
 }
 
-@Composable
-internal fun MemberBrandWordmark(
-    height: Dp,
-    modifier: Modifier = Modifier,
-    contentDescription: String? = null,
-) {
-    Row(
-        modifier = modifier.height(height),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        AppBrandWordmark(
-            modifier = Modifier.height(height),
-            contentDescription = contentDescription,
-        )
-        SupporterBadgeIfPresent(height = height)
-    }
-}
-
 /**
  * Just the "Supporter"/"Supporter+" badge, with no wordmark alongside it — split out of
- * [MemberBrandWordmark] so screens that need to fade the rest of their header away (see the
+ * [AppBrandLogo] so screens that need to fade the rest of their header away (see the
  * profile-select → center transition in ProfileSelectionScreen) can keep this piece visible on
- * its own, independent of whatever alpha the wordmark next to it is animating through.
+ * its own, independent of whatever alpha the brand logo next to it is animating through.
  */
 @Composable
 internal fun SupporterBadgeIfPresent(
@@ -142,11 +124,11 @@ private fun MemberBadge(
             text = badgeStyle.label,
             style = TextStyle(
                 brush = gradientBrush,
-                fontSize = (height.value * MemberWordmarkHeightRatio).sp,
+                fontSize = (height.value * MemberBadgeFontSizeRatio).sp,
                 fontWeight = FontWeight.SemiBold,
             ),
             modifier = Modifier
-                .offset(y = height * MemberWordmarkVerticalOffsetRatio)
+                .offset(y = height * MemberBadgeVerticalOffsetRatio)
                 .onSizeChanged { badgeSize = it },
         )
     }

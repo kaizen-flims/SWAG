@@ -9,14 +9,12 @@ import nuvio.composeapp.generated.resources.swag_icon
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-internal fun AppBrandWordmark(
+internal fun AppBrandLogo(
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
-    icon: AppIconOption? = null,
 ) {
-    val resource = icon?.wordmarkResource ?: Res.drawable.swag_icon
     Image(
-        painter = painterResource(resource),
+        painter = painterResource(Res.drawable.swag_icon),
         contentDescription = contentDescription,
         contentScale = ContentScale.Fit,
         modifier = modifier,

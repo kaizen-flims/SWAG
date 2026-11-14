@@ -28,7 +28,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.nuvio.app.core.ui.nuvio
-import com.nuvio.app.features.settings.AppBrandWordmark
+import com.nuvio.app.features.settings.AppBrandLogo
 import kotlinx.coroutines.launch
 import kotlin.math.cos
 import kotlin.math.sin
@@ -37,8 +37,8 @@ internal const val AppIntroMinDurationMs = 1300L
 
 @Composable
 internal fun AppIntroContent(modifier: Modifier = Modifier) {
-    val wordmarkAlpha = remember { Animatable(0f) }
-    val wordmarkScale = remember { Animatable(0.55f) }
+    val logoAlpha = remember { Animatable(0f) }
+    val logoScale = remember { Animatable(0.55f) }
     val glowAlpha = remember { Animatable(0f) }
 
     val driftAngle by rememberInfiniteTransition(label = "intro_glow_drift").animateFloat(
@@ -58,9 +58,9 @@ internal fun AppIntroContent(modifier: Modifier = Modifier) {
             glowAlpha.animateTo(1f, tween(durationMillis = 600, easing = FastOutSlowInEasing))
         }
         launch {
-            wordmarkAlpha.animateTo(1f, tween(durationMillis = 350, easing = FastOutSlowInEasing))
+            logoAlpha.animateTo(1f, tween(durationMillis = 350, easing = FastOutSlowInEasing))
         }
-        wordmarkScale.animateTo(
+        logoScale.animateTo(
             targetValue = 1f,
             animationSpec = spring(
                 dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -95,13 +95,13 @@ internal fun AppIntroContent(modifier: Modifier = Modifier) {
                     ),
                 ),
         )
-        AppBrandWordmark(
+        AppBrandLogo(
             modifier = Modifier
                 .height(52.dp)
                 .graphicsLayer {
-                    alpha = wordmarkAlpha.value
-                    scaleX = wordmarkScale.value
-                    scaleY = wordmarkScale.value
+                    alpha = logoAlpha.value
+                    scaleX = logoScale.value
+                    scaleY = logoScale.value
                 },
         )
     }
