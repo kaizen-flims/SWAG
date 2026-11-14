@@ -85,7 +85,7 @@ import com.nuvio.app.features.profiles.ProfileSwitcherTab
 import com.nuvio.app.features.profiles.parseHexColor
 import com.nuvio.app.features.profiles.profileAvatarImageUrl
 import com.nuvio.app.features.search.SearchScreen
-import com.nuvio.app.features.settings.AppBrandWordmark
+import com.nuvio.app.features.settings.AppBrandLogo
 import com.nuvio.app.features.settings.SettingsScreen
 import com.nuvio.app.features.watchprogress.ContinueWatchingItem
 import com.nuvio.app.navigation.AppRoute
@@ -620,7 +620,7 @@ internal fun AppLoadingContent(
                         modifier = emblemModifier.size(96.dp),
                     )
                 } else {
-                    AppBrandWordmark(
+                    AppBrandLogo(
                         contentDescription = stringResource(Res.string.app_brand_name),
                         modifier = emblemModifier
                             .width(160.dp)
