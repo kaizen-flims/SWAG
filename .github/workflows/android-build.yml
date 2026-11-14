@@ -59,6 +59,13 @@ jobs:
       - name: Restore required upstream Android libraries
         run: bash scripts/restore-android-libs.sh
 
+      - name: Generate #SWAG Android branding assets
+        run: |
+          python3 -m venv .icon-venv
+          . .icon-venv/bin/activate
+          python -m pip install --disable-pip-version-check cairosvg pillow
+          python scripts/generate-android-icons.py
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
