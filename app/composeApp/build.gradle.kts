@@ -6,10 +6,7 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.gradle.process.CommandLineArgumentProvider
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.TestExecutable
-import org.jetbrains.kotlin.gradle.targets.native.tasks.KotlinNativeSimulatorTest
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
 import java.util.Properties
 
@@ -208,20 +205,6 @@ abstract class GenerateRuntimeConfigsTask : DefaultTask() {
     }
 }
 
-fun readXcconfigValue(file: File, key: String): String? {
-    if (!file.exists()) return null
-    return file.readLines()
-        .asSequence()
-        .map(String::trim)
-        .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains('=') }
-        .map { line ->
-            val separatorIndex = line.indexOf('=')
-            line.substring(0, separatorIndex).trim() to line.substring(separatorIndex + 1).trim()
-        }
-        .firstOrNull { (entryKey, _) -> entryKey == key }
-        ?.second
-}
-
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
@@ -234,32 +217,8 @@ val supabaseProps = Properties().apply {
     val propsFile = rootProject.file("local.properties")
     if (propsFile.exists()) propsFile.inputStream().use { load(it) }
 }
-val appVersionConfigFile = rootProject.file("iosApp/Configuration/Version.xcconfig")
-val releaseAppVersionName = providers.gradleProperty("nuvio.app.versionName").orNull
-    ?: readXcconfigValue(appVersionConfigFile, "MARKETING_VERSION")
-    ?: error("MARKETING_VERSION is missing from ${appVersionConfigFile.path}")
-val iosReleaseDisabledPhases = providers.gradleProperty("nuvio.ios.releaseDisablePhases").orNull
-    ?.trim()
-    ?.takeIf { it.isNotEmpty() }
-val releaseAppVersionCode = readXcconfigValue(appVersionConfigFile, "CURRENT_PROJECT_VERSION")
-    ?.toIntOrNull()
-    ?: error("CURRENT_PROJECT_VERSION is missing or invalid in ${appVersionConfigFile.path}")
-val iosDistribution = (
-    providers.gradleProperty("nuvio.ios.distribution").orNull
-        ?: System.getenv("NUVIO_IOS_DISTRIBUTION")
-        ?: supabaseProps.getProperty("NUVIO_IOS_DISTRIBUTION")
-        ?: "appstore"
-    ).trim().lowercase()
-require(iosDistribution == "appstore" || iosDistribution == "full") {
-    "NUVIO_IOS_DISTRIBUTION must be 'appstore' or 'full'."
-}
-val iosDistributionSourceDir = if (iosDistribution == "full") {
-    "src/iosFull/kotlin"
-} else {
-    "src/iosAppStore/kotlin"
-}
-val iosFrameworkBundleId = "com.nuvio.media"
-val nuvioEngineAppleFramework = rootProject.file("../nuvio-engine/platform/apple/NuvioEngine.xcframework")
+val releaseAppVersionName = providers.gradleProperty("nuvio.app.versionName").orElse("0.6.12").get()
+val releaseAppVersionCode = providers.gradleProperty("nuvio.app.versionCode").orElse("155").get().toInt()
 val fullCommonSourceDir = project.file("src/fullCommonMain/kotlin")
 val generatedRuntimeConfigDir = layout.buildDirectory.dir("generated/runtime-config/kotlin")
 val requestedGradleTasks = gradle.startParameter.taskNames.map { taskName ->
@@ -365,90 +324,6 @@ kotlin {
         }
     }
     
-    val iosTargets = listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    )
-
-    iosTargets.forEach { iosTarget ->
-        val nuvioEngineSlice = if (iosTarget.name == "iosArm64") {
-            "ios-arm64"
-        } else {
-            "ios-arm64_x86_64-simulator"
-        }
-        val nuvioEngineSliceDirectory = nuvioEngineAppleFramework.resolve(nuvioEngineSlice)
-        iosTarget.compilations.getByName("main") {
-            cinterops {
-                create("commoncrypto") {
-                    defFile(project.file("src/nativeInterop/cinterop/commoncrypto.def"))
-                    compilerOpts("-I${project.projectDir}/src/nativeInterop/cinterop")
-                }
-                create("appicon") {
-                    defFile(project.file("src/nativeInterop/cinterop/appicon.def"))
-                    compilerOpts("-I${project.projectDir}/src/nativeInterop/cinterop")
-                }
-                if (iosDistribution == "full") {
-                    check(nuvioEngineSliceDirectory.resolve("libCNuvioEngine.a").isFile) {
-                        "Build the local Nuvio Engine Apple XCFramework before compiling iOS Full."
-                    }
-                    create("nuvioengine") {
-                        defFile(project.file("src/nativeInterop/cinterop/nuvioengine.def"))
-                        compilerOpts("-I${nuvioEngineSliceDirectory.resolve("Headers").absolutePath}")
-                        extraOpts("-libraryPath", nuvioEngineSliceDirectory.absolutePath)
-                    }
-                }
-                configureEach {
-                    extraOpts("-Xccall-mode", "direct")
-                }
-            }
-
-            if (iosDistribution == "full") {
-                defaultSourceSet.kotlin.srcDir(fullCommonSourceDir)
-            }
-            defaultSourceSet.kotlin.srcDir(project.file(iosDistributionSourceDir))
-            defaultSourceSet.dependencies {
-                implementation(libs.ktor.client.darwin)
-                if (iosDistribution == "full") {
-                    implementation(libs.quickjs.kt)
-                    implementation(libs.ksoup)
-                }
-            }
-        }
-
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-            freeCompilerArgs += listOf("-Xbinary=bundleId=$iosFrameworkBundleId")
-            iosReleaseDisabledPhases?.let { phases ->
-                if (buildType == org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.RELEASE) {
-                    freeCompilerArgs += listOf("-Xdisable-phases=$phases")
-                }
-            }
-
-            // Biometric authentication and the profile PIN cache use Apple Security,
-            // LocalAuthentication, and CoreFoundation APIs on every iOS distribution.
-            linkerOpts(
-                "-framework", "Security",
-                "-framework", "LocalAuthentication",
-                "-framework", "CoreFoundation",
-            )
-            if (iosDistribution == "full") {
-                linkerOpts(
-                    "-lc++",
-                    "-framework", "SystemConfiguration",
-                )
-            }
-        }
-
-        if (iosTarget.name == "iosSimulatorArm64") {
-            val testEntitlements = project.file("src/iosTest/resources/keychain-test.entitlements")
-            iosTarget.binaries.withType<TestExecutable>().configureEach {
-                linkerOpts("-sectcreate", "__TEXT", "__entitlements", testEntitlements.absolutePath)
-                linkTaskProvider.configure { inputs.file(testEntitlements) }
-            }
-        }
-    }
-    
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
     }
@@ -456,9 +331,6 @@ kotlin {
     sourceSets {
         all {
             languageSettings.optIn("coil3.annotation.ExperimentalCoilApi")
-        }
-        matching { it.name.startsWith("ios") }.configureEach {
-            languageSettings.optIn("kotlinx.cinterop.BetaInteropApi")
         }
         val commonMain = getByName("commonMain") {
             kotlin.srcDir(generatedRuntimeConfigDir)
@@ -566,22 +438,6 @@ kotlin {
             implementation("io.ktor:ktor-client-mock:${libs.versions.ktor.get()}")
         }
     }
-}
-
-val bootIosTestSimulator = tasks.register<Exec>("bootIosTestSimulator") {
-    val device = tasks.named<KotlinNativeSimulatorTest>("iosSimulatorArm64Test").flatMap { it.device }
-    commandLine("xcrun", "simctl", "boot")
-    argumentProviders.add(CommandLineArgumentProvider { listOf(device.get()) })
-    isIgnoreExitValue = true
-}
-
-tasks.withType<KotlinNativeSimulatorTest>().configureEach {
-    standalone.set(false)
-    dependsOn(bootIosTestSimulator)
-}
-
-configurations.matching { it.name == "iosMainImplementation" }.configureEach {
-    project.dependencies.add(name, libs.ktor.client.darwin)
 }
 
 configurations.all {

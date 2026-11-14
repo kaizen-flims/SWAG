@@ -1,20 +1,6 @@
 import java.util.Properties
 import javax.inject.Inject
 
-fun readXcconfigValue(file: File, key: String): String? {
-    if (!file.exists()) return null
-    return file.readLines()
-        .asSequence()
-        .map(String::trim)
-        .filter { it.isNotEmpty() && !it.startsWith("#") && it.contains('=') }
-        .map { line ->
-            val separatorIndex = line.indexOf('=')
-            line.substring(0, separatorIndex).trim() to line.substring(separatorIndex + 1).trim()
-        }
-        .firstOrNull { (entryKey, _) -> entryKey == key }
-        ?.second
-}
-
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeCompiler)
@@ -39,13 +25,8 @@ val sentryAuthToken = envOrLocalProperty("SENTRY_AUTH_TOKEN")
 val sentryOrg = envOrLocalProperty("SENTRY_ORG")
 val sentryProject = envOrLocalProperty("SENTRY_PROJECT")
 val sentryMappingUploadEnabled = sentryAuthToken != null && sentryOrg != null && sentryProject != null
-val appVersionConfigFile = rootProject.file("iosApp/Configuration/Version.xcconfig")
-val releaseAppVersionName = providers.gradleProperty("nuvio.app.versionName").orNull
-    ?: readXcconfigValue(appVersionConfigFile, "MARKETING_VERSION")
-    ?: error("MARKETING_VERSION is missing from ${appVersionConfigFile.path}")
-val releaseAppVersionCode = readXcconfigValue(appVersionConfigFile, "CURRENT_PROJECT_VERSION")
-    ?.toIntOrNull()
-    ?: error("CURRENT_PROJECT_VERSION is missing or invalid in ${appVersionConfigFile.path}")
+val releaseAppVersionName = providers.gradleProperty("nuvio.app.versionName").orElse("0.6.12").get()
+val releaseAppVersionCode = providers.gradleProperty("nuvio.app.versionCode").orElse("155").get().toInt()
 val requestedTaskNames = gradle.startParameter.taskNames.map { it.substringAfterLast(':') }
 val buildsReleaseApks = requestedTaskNames.any {
     it.startsWith("assemble", ignoreCase = true) && it.endsWith("Release", ignoreCase = true)

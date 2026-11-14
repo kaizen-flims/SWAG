@@ -1,4 +1,4 @@
-rootProject.name = "Nuvio"
+rootProject.name = "SWAG"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {
