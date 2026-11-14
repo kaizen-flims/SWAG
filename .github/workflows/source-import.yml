@@ -1,0 +1,171 @@
+name: Import Nuvio source project
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/source-import.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out workstation
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Reconstruct and extract verified source
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path, PurePosixPath
+          import os
+          import shutil
+          import stat
+          import zipfile
+
+          source_dir = Path("archives/nuvio-mobile-enhanced")
+          expected_parts = [
+              source_dir / f"NuvioMobile-Enhanced-0.6.12-beta_part{index}.zip"
+              for index in (1, 2, 3)
+          ]
+          missing = [str(path) for path in expected_parts if not path.is_file()]
+          if missing:
+              raise SystemExit("Missing archive parts: " + ", ".join(missing))
+
+          destination = Path("app")
+          if destination.exists() and any(destination.iterdir()):
+              raise SystemExit("app/ already contains files; refusing to overwrite an existing project.")
+
+          combined = Path("/tmp/nuvio-mobile-enhanced-combined.zip")
+          with combined.open("wb") as output:
+              for part in expected_parts:
+                  with part.open("rb") as source:
+                      shutil.copyfileobj(source, output, length=8 * 1024 * 1024)
+
+          expected_prefix = "NuvioMobile-Enhanced-0.6.12-beta/"
+          file_count = 0
+          directory_count = 0
+          total_bytes = 0
+          seen_paths = set()
+
+          with zipfile.ZipFile(combined) as archive:
+              bad_entry = archive.testzip()
+              if bad_entry:
+                  raise SystemExit(f"ZIP CRC check failed at: {bad_entry}")
+
+              roots = {
+                  PurePosixPath(item.filename).parts[0]
+                  for item in archive.infolist()
+                  if item.filename.strip("/")
+              }
+              if roots != {expected_prefix.rstrip("/")}:
+                  raise SystemExit(f"Unexpected archive root(s): {sorted(roots)}")
+
+              destination.mkdir(parents=True, exist_ok=True)
+              for item in archive.infolist():
+                  raw_name = item.filename
+                  if "\\\\" in raw_name:
+                      raise SystemExit(f"Backslash path rejected: {raw_name}")
+                  if not raw_name.startswith(expected_prefix):
+                      if raw_name == expected_prefix.rstrip("/") or raw_name == expected_prefix:
+                          continue
+                      raise SystemExit(f"Entry outside expected source root: {raw_name}")
+
+                  relative_text = raw_name[len(expected_prefix):].rstrip("/")
+                  if not relative_text:
+                      continue
+                  relative = PurePosixPath(relative_text)
+                  if relative.is_absolute() or ".." in relative.parts:
+                      raise SystemExit(f"Unsafe archive path rejected: {raw_name}")
+
+                  key = relative.as_posix()
+                  if key in seen_paths:
+                      raise SystemExit(f"Duplicate archive path rejected: {key}")
+                  seen_paths.add(key)
+
+                  target = destination.joinpath(*relative.parts)
+                  mode = item.external_attr >> 16
+                  if stat.S_ISLNK(mode):
+                      raise SystemExit(f"Symlink entry rejected for safe import: {raw_name}")
+
+                  if item.is_dir() or raw_name.endswith("/"):
+                      target.mkdir(parents=True, exist_ok=True)
+                      directory_count += 1
+                      continue
+
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with archive.open(item, "r") as source, target.open("wb") as output:
+                      shutil.copyfileobj(source, output, length=8 * 1024 * 1024)
+
+                  if mode:
+                      os.chmod(target, mode & 0o777)
+                  file_count += 1
+                  total_bytes += item.file_size
+
+          print(f"Imported {file_count} files and {directory_count} directories.")
+          print(f"Total extracted file size: {total_bytes:,} bytes.")
+          print("Project top-level entries:")
+          for child in sorted(destination.iterdir(), key=lambda path: path.name.lower()):
+              print(f"  {child.name}{'/' if child.is_dir() else ''}")
+          PY
+
+      - name: Add workstation ignore rules and update root guide
+        shell: bash
+        run: |
+          cat > .gitignore <<'EOF'
+          # Android / Gradle build outputs
+          .gradle/
+          **/.gradle/
+          **/build/
+          .kotlin/
+          **/.kotlin/
+          local.properties
+          **/local.properties
+
+          # IDE and operating-system files
+          .idea/
+          **/.idea/
+          *.iml
+          .DS_Store
+          Thumbs.db
+          EOF
+
+          cat > README.md <<'EOF'
+          # #SWAG Workstation
+
+          The active development workspace for rebuilding and rebranding #SWAG. App source, code changes, and workstation GitHub Actions workflows live here. The original `kaizen-flims/SWAG` repository is not changed by this import.
+
+          ## Repository layout
+
+          - `app/`: extracted Nuvio Mobile Enhanced 0.6.12-beta project. Build commands should run from this directory.
+          - `archives/nuvio-mobile-enhanced/`: original three ZIP parts, preserved unchanged as source provenance.
+          - `assets/incoming/`: imported SVG awaiting visual identification.
+          - `.github/workflows/`: workstation-owned automation. Upstream workflows inside `app/.github/` are nested project files and are not active in this repository.
+
+          ## Source handling
+
+          The three archive parts were concatenated in filename order and passed a ZIP CRC test before extraction. The extracted project is kept under `app/` so its original build files and upstream workflow definitions stay isolated from workstation automation.
+
+          ## Development rules
+
+          - Preserve existing backend behavior and service endpoints during the rebrand.
+          - Make and test changes in this workstation repository.
+          - Keep the original `kaizen-flims/SWAG` repository untouched until a reviewed version is ready to publish.
+          - Inspect upstream licensing and submodule requirements before changing or redistributing source.
+          EOF
+
+      - name: Commit imported source tree
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app README.md .gitignore
+          git commit -m "Import Nuvio source project into app/"
+          git push origin HEAD:main
