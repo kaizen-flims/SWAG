@@ -52,6 +52,16 @@ jobs:
             "cmake;3.22.1" \
             "ndk;27.2.12479018"
 
+      - name: Restore required upstream Android libraries
+        working-directory: app/composeApp
+        run: |
+          mkdir -p libs
+          UPSTREAM="https://raw.githubusercontent.com/kaizen-flims/SWAG/23afa5996ccf30c59188c769a5722b9dba9b5efe/composeApp/libs"
+          curl --fail --location --retry 3 "$UPSTREAM/nuvio-libass-release.aar" --output libs/nuvio-libass-release.aar
+          curl --fail --location --retry 3 "$UPSTREAM/quickjs-kt-android-1.0.5-nuvio.aar" --output libs/quickjs-kt-android-1.0.5-nuvio.aar
+          unzip -t libs/nuvio-libass-release.aar
+          unzip -t libs/quickjs-kt-android-1.0.5-nuvio.aar
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
