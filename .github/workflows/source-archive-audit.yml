@@ -1,0 +1,103 @@
+name: Source archive audit
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "archives/nuvio-mobile-enhanced/**"
+      - ".github/workflows/source-archive-audit.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect-source-archive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out workstation
+        uses: actions/checkout@v4
+
+      - name: Inspect archive parts
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import shutil
+          import zipfile
+
+          source_dir = Path("archives/nuvio-mobile-enhanced")
+          parts = sorted(source_dir.glob("NuvioMobile-Enhanced-0.6.12-beta_part*.zip"))
+          report = []
+
+          def note(message):
+              print(message)
+              report.append(message)
+
+          if not parts:
+              note("ERROR: No source archive parts were found.")
+              Path("archive-audit-report.txt").write_text("\\n".join(report) + "\\n")
+              raise SystemExit(1)
+
+          note(f"Found {len(parts)} archive part(s).")
+          for part in parts:
+              digest = hashlib.sha256()
+              with part.open("rb") as stream:
+                  head = stream.read(8)
+                  digest.update(head)
+                  for chunk in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+                      digest.update(chunk)
+              note(f"- {part.name}: {part.stat().st_size:,} bytes; header={head.hex()}; sha256={digest.hexdigest()}")
+
+          def inspect_zip(label, path):
+              try:
+                  with zipfile.ZipFile(path) as archive:
+                      bad_entry = archive.testzip()
+                      if bad_entry:
+                          note(f"{label}: ZIP opened, but CRC validation failed at {bad_entry}")
+                          return False
+                      entries = archive.infolist()
+                      uncompressed = sum(item.file_size for item in entries)
+                      roots = sorted({item.filename.split("/", 1)[0] for item in entries if item.filename})
+                      note(f"{label}: VALID ZIP; {len(entries)} entries; {uncompressed:,} bytes uncompressed.")
+                      note("Top-level entries: " + (", ".join(roots[:30]) if roots else "(none)"))
+                      for item in entries[:60]:
+                          note(f"  {item.filename} ({item.file_size:,} bytes)")
+                      if len(entries) > 60:
+                          note(f"  ... plus {len(entries) - 60} more entries")
+                      return True
+              except (zipfile.BadZipFile, OSError, EOFError) as error:
+                  note(f"{label}: not a readable complete ZIP ({error})")
+                  return False
+
+          valid_individual = []
+          for part in parts:
+              if inspect_zip(f"Individual part {part.name}", part):
+                  valid_individual.append(part)
+
+          combined = Path("nuvio-mobile-enhanced-combined.zip")
+          note("Trying byte-for-byte concatenation in filename order...")
+          with combined.open("wb") as output:
+              for part in parts:
+                  with part.open("rb") as source:
+                      shutil.copyfileobj(source, output, length=8 * 1024 * 1024)
+
+          if inspect_zip("Concatenated archive", combined):
+              note("RESULT: The three parts form one valid ZIP when concatenated in filename order.")
+          elif valid_individual:
+              note("RESULT: One or more parts are independent valid ZIP archives; no concatenated archive was confirmed.")
+          else:
+              note("RESULT: No complete ZIP was confirmed. Keep the original parts untouched and inspect the splitting format before reconstruction.")
+
+          Path("archive-audit-report.txt").write_text("\\n".join(report) + "\\n", encoding="utf-8")
+          PY
+
+      - name: Upload audit report
+        uses: actions/upload-artifact@v4
+        with:
+          name: source-archive-audit
+          path: archive-audit-report.txt
+          if-no-files-found: error
+          retention-days: 7
