@@ -4,7 +4,12 @@ set -euo pipefail
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 LIB_DIR="$REPO_ROOT/app/composeApp/libs"
-UPSTREAM="https://raw.githubusercontent.com/kaizen-flims/SWAG/23afa5996ccf30c59188c769a5722b9dba9b5efe/composeApp/libs"
+
+# The original repository revision previously used here was deleted. These
+# binaries are restored from the matching Nuvio Mobile Enhanced library set,
+# pinned to an immutable upstream commit rather than a moving branch.
+UPSTREAM="https://raw.githubusercontent.com/luqmanfadlli/NuvioMobile-Enhanced/acde636a75d0e8f670bc0863d07a2fcb417eeee9/composeApp/libs"
+
 FILES=(
   "lib-decoder-av1-release.aar"
   "lib-decoder-ffmpeg-release.aar"
