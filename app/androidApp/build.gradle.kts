@@ -25,8 +25,8 @@ val sentryAuthToken = envOrLocalProperty("SENTRY_AUTH_TOKEN")
 val sentryOrg = envOrLocalProperty("SENTRY_ORG")
 val sentryProject = envOrLocalProperty("SENTRY_PROJECT")
 val sentryMappingUploadEnabled = sentryAuthToken != null && sentryOrg != null && sentryProject != null
-val releaseAppVersionName = providers.gradleProperty("nuvio.app.versionName").orElse("0.6.12").get()
-val releaseAppVersionCode = providers.gradleProperty("nuvio.app.versionCode").orElse("155").get().toInt()
+val releaseAppVersionName = providers.gradleProperty("nuvio.app.versionName").orElse("1.0.0").get()
+val releaseAppVersionCode = providers.gradleProperty("nuvio.app.versionCode").orElse("156").get().toInt()
 val requestedTaskNames = gradle.startParameter.taskNames.map { it.substringAfterLast(':') }
 val buildsReleaseApks = requestedTaskNames.any {
     it.startsWith("assemble", ignoreCase = true) && it.endsWith("Release", ignoreCase = true)
