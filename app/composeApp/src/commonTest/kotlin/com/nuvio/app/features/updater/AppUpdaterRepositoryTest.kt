@@ -7,6 +7,8 @@ import kotlin.test.assertNull
 class AppUpdaterRepositoryTest {
     @Test
     fun channelsUseTheSameReleaseEndpointsAsTv() {
+        assertEquals("kaizen-flims", GITHUB_OWNER)
+        assertEquals("SWAG", GITHUB_REPO)
         assertEquals("releases/latest", AppUpdaterRepository.releasePath(UpdateChannel.STABLE))
         assertEquals("releases?per_page=100", AppUpdaterRepository.releasePath(UpdateChannel.BETA))
     }
