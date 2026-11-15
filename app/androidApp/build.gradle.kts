@@ -49,7 +49,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.nuvio.media"
+        applicationId = "com.swag.media"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = releaseAppVersionCode
@@ -101,14 +101,8 @@ android {
         }
     }
 
-    splits {
-        abi {
-            isEnable = buildsReleaseApks
-            reset()
-            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
-            isUniversalApk = false
-        }
-    }
+    // Ship one APK containing native libraries for every supported ABI.
+    // ABI splitting would create multiple APKs, so keep it disabled.
 
     buildTypes {
         getByName("release") {
@@ -202,9 +196,6 @@ val rust = tasks.register<CargoNdkBuild>("buildRust") {
 }
 
 androidComponents {
-    onVariants(selector().withBuildType("debug")) { variant ->
-        variant.applicationId.set("com.nuviodebug.com")
-    }
     onVariants { variant ->
         variant.sources.jniLibs?.addGeneratedSourceDirectory(rust, CargoNdkBuild::jniLibs)
     }
