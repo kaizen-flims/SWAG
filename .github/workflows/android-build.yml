@@ -69,9 +69,22 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Build #SWAG Android full debug APK
+      - name: Create temporary CI signing key for optimized comparison build
+        run: |
+          keytool -genkeypair -noprompt -v \
+            -keystore "$RUNNER_TEMP/swag-ci-release.jks" \
+            -storepass changeit -keypass changeit -alias swag-ci \
+            -dname "CN=SWAG CI Benchmark" -keyalg RSA -keysize 2048 -validity 3650
+          cat > app/local.properties <<EOF
+          NUVIO_RELEASE_STORE_FILE=$RUNNER_TEMP/swag-ci-release.jks
+          NUVIO_RELEASE_STORE_PASSWORD=changeit
+          NUVIO_RELEASE_KEY_ALIAS=swag-ci
+          NUVIO_RELEASE_KEY_PASSWORD=changeit
+          EOF
+
+      - name: Build #SWAG Android full debug and optimized release APKs
         working-directory: app
-        run: ./gradlew --no-daemon :androidApp:assembleFullDebug
+        run: ./gradlew --no-daemon :androidApp:assembleFullDebug :androidApp:assembleFullRelease
 
       - name: Smoke test app launch on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -85,10 +98,18 @@ jobs:
           emulator-boot-timeout: 900
           script: bash "$GITHUB_WORKSPACE/scripts/smoke-test-android.sh"
 
-      - name: Upload APK
+      - name: Upload debug APK
         uses: actions/upload-artifact@v7
         with:
           name: swag-android-full-debug
           path: app/androidApp/build/outputs/apk/full/debug/*.apk
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload optimized release comparison APKs
+        uses: actions/upload-artifact@v7
+        with:
+          name: swag-android-full-release-comparison
+          path: app/androidApp/build/outputs/apk/full/release/*.apk
           if-no-files-found: error
           retention-days: 7
