@@ -115,13 +115,19 @@ jobs:
         run: |
           set -euo pipefail
           shopt -s nullglob
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          APKSIGNER="$SDK_ROOT/build-tools/37.0.0/apksigner"
+          if [ ! -x "$APKSIGNER" ]; then
+            echo "Android apksigner was not found at $APKSIGNER" >&2
+            exit 1
+          fi
           apks=(app/androidApp/build/outputs/apk/full/release/*.apk)
           if [ ${#apks[@]} -eq 0 ]; then
             echo "No full-release APKs were produced." >&2
             exit 1
           fi
           for apk in "${apks[@]}"; do
-            apksigner verify --verbose "$apk"
+            "$APKSIGNER" verify --verbose "$apk"
           done
 
       - name: Smoke test app launch on Android emulator
