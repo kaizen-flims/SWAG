@@ -217,8 +217,8 @@ val supabaseProps = Properties().apply {
     val propsFile = rootProject.file("local.properties")
     if (propsFile.exists()) propsFile.inputStream().use { load(it) }
 }
-val releaseAppVersionName = providers.gradleProperty("nuvio.app.versionName").orElse("0.6.12").get()
-val releaseAppVersionCode = providers.gradleProperty("nuvio.app.versionCode").orElse("155").get().toInt()
+val releaseAppVersionName = providers.gradleProperty("nuvio.app.versionName").orElse("1.0.0").get()
+val releaseAppVersionCode = providers.gradleProperty("nuvio.app.versionCode").orElse("156").get().toInt()
 val fullCommonSourceDir = project.file("src/fullCommonMain/kotlin")
 val generatedRuntimeConfigDir = layout.buildDirectory.dir("generated/runtime-config/kotlin")
 val requestedGradleTasks = gradle.startParameter.taskNames.map { taskName ->
