@@ -72,22 +72,57 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
-      - name: Create temporary CI signing key for optimized comparison build
+      - name: Configure permanent SWAG release signing
+        env:
+          SWAG_RELEASE_KEYSTORE_BASE64: ${{ secrets.SWAG_RELEASE_KEYSTORE_BASE64 }}
+          SWAG_RELEASE_STORE_PASSWORD: ${{ secrets.SWAG_RELEASE_STORE_PASSWORD }}
+          SWAG_RELEASE_KEY_ALIAS: ${{ secrets.SWAG_RELEASE_KEY_ALIAS }}
+          SWAG_RELEASE_KEY_PASSWORD: ${{ secrets.SWAG_RELEASE_KEY_PASSWORD }}
         run: |
-          keytool -genkeypair -noprompt -v \
-            -keystore "$RUNNER_TEMP/swag-ci-release.jks" \
-            -storepass changeit -keypass changeit -alias swag-ci \
-            -dname "CN=SWAG CI Benchmark" -keyalg RSA -keysize 2048 -validity 3650
-          cat > app/local.properties <<EOF
-          NUVIO_RELEASE_STORE_FILE=$RUNNER_TEMP/swag-ci-release.jks
-          NUVIO_RELEASE_STORE_PASSWORD=changeit
-          NUVIO_RELEASE_KEY_ALIAS=swag-ci
-          NUVIO_RELEASE_KEY_PASSWORD=changeit
-          EOF
+          set -euo pipefail
+          for name in \
+            SWAG_RELEASE_KEYSTORE_BASE64 \
+            SWAG_RELEASE_STORE_PASSWORD \
+            SWAG_RELEASE_KEY_ALIAS \
+            SWAG_RELEASE_KEY_PASSWORD; do
+            if [ -z "${!name:-}" ]; then
+              echo "Required GitHub Actions secret is missing: $name" >&2
+              exit 1
+            fi
+          done
 
-      - name: Build #SWAG Android full debug and optimized release APKs
+          KEYSTORE_PATH="$RUNNER_TEMP/swag-release.jks"
+          printf '%s' "$SWAG_RELEASE_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+          chmod 600 "$KEYSTORE_PATH"
+
+          keytool -list -keystore "$KEYSTORE_PATH" \
+            -storepass "$SWAG_RELEASE_STORE_PASSWORD" \
+            -alias "$SWAG_RELEASE_KEY_ALIAS" >/dev/null
+
+          cat > app/local.properties <<EOF
+          NUVIO_RELEASE_STORE_FILE=$KEYSTORE_PATH
+          NUVIO_RELEASE_STORE_PASSWORD=$SWAG_RELEASE_STORE_PASSWORD
+          NUVIO_RELEASE_KEY_ALIAS=$SWAG_RELEASE_KEY_ALIAS
+          NUVIO_RELEASE_KEY_PASSWORD=$SWAG_RELEASE_KEY_PASSWORD
+          EOF
+          chmod 600 app/local.properties
+
+      - name: Build #SWAG Android full debug and signed release APKs
         working-directory: app
         run: ./gradlew --no-daemon :androidApp:assembleFullDebug :androidApp:assembleFullRelease
+
+      - name: Verify signed release APKs
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          apks=(app/androidApp/build/outputs/apk/full/release/*.apk)
+          if [ ${#apks[@]} -eq 0 ]; then
+            echo "No full-release APKs were produced." >&2
+            exit 1
+          fi
+          for apk in "${apks[@]}"; do
+            apksigner verify --verbose "$apk"
+          done
 
       - name: Smoke test app launch on Android emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -109,10 +144,10 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-      - name: Upload optimized release comparison APKs
+      - name: Upload permanently signed release APKs
         uses: actions/upload-artifact@v7
         with:
-          name: swag-android-full-release-comparison
+          name: swag-android-full-release
           path: app/androidApp/build/outputs/apk/full/release/*.apk
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 30
