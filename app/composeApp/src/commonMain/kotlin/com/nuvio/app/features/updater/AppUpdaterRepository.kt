@@ -33,8 +33,8 @@ internal data class GitHubAssetDto(
 internal class NoChannelReleaseException : IllegalStateException()
 
 internal const val GITHUB_API_BASE = "https://api.github.com"
-internal const val GITHUB_OWNER = "luqmanfadlli"
-internal const val GITHUB_REPO = "NuvioMobile-Enhanced"
+internal const val GITHUB_OWNER = "kaizen-flims"
+internal const val GITHUB_REPO = "SWAG"
 
 internal object AppUpdaterRepository {
     private val json = Json {
@@ -48,7 +48,7 @@ internal object AppUpdaterRepository {
             url = "$GITHUB_API_BASE/repos/$GITHUB_OWNER/$GITHUB_REPO/${releasePath(channel)}",
             headers = mapOf(
                 "Accept" to "application/vnd.github+json",
-                "User-Agent" to "NuvioMobile",
+                "User-Agent" to "SWAG-Android",
             ),
             body = "",
         )
