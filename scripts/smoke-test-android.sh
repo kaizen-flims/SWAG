@@ -9,11 +9,9 @@ install_and_check() {
   local apk_dir="$ROOT/$variant"
   local apk=""
 
-  if [[ "$variant" == "release" ]]; then
-    apk="$(find "$apk_dir" -maxdepth 1 -type f -name '*x86_64*.apk' -print -quit)"
-  else
-    apk="$(find "$apk_dir" -maxdepth 1 -type f -name '*.apk' -print -quit)"
-  fi
+  # The CI emulator is x86_64. Always install the matching ABI split;
+  # selecting the first debug APK can pick x86 and fail with NO_MATCHING_ABIS.
+  apk="$(find "$apk_dir" -maxdepth 1 -type f -name '*x86_64*.apk' -print -quit)"
 
   if [[ -z "$apk" ]]; then
     echo "No $variant APK found in $apk_dir" >&2
