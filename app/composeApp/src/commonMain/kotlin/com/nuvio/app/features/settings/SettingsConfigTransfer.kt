@@ -186,6 +186,17 @@ internal object SettingsConfigTransfer {
         )
     }
 
+    suspend fun importBundledDefaults(content: String): Boolean {
+        val config = parse(content) ?: return false
+        return try {
+            importAll(config.settings) == 0
+        } catch (error: CancellationException) {
+            throw error
+        } catch (_: Throwable) {
+            false
+        }
+    }
+
     fun startImport(settings: JsonObject) {
         if (_isImporting.value) return
         _isImporting.value = true

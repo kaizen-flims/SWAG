@@ -67,6 +67,7 @@ import com.nuvio.app.features.search.DiscoverSelectionStorage
 import com.nuvio.app.features.search.SearchHistoryStorage
 import com.nuvio.app.features.servers.ServerStorage
 import com.nuvio.app.features.settings.ProfileTitleFactsStorage
+import com.nuvio.app.features.settings.SettingsConfigTransfer
 import com.nuvio.app.features.settings.SentrySettingsStorage
 import com.nuvio.app.features.settings.AppIconPlatform
 import com.nuvio.app.features.settings.ThemeSettingsStorage
@@ -197,13 +198,13 @@ open class MainActivity : AppCompatActivity() {
         EpisodeReleaseNotificationPlatform.initialize(applicationContext)
         EpisodeReleaseNotificationPlatform.bindActivity(this)
 
-        if (StartupPreloader.isComplete) {
-            showContent()
-        } else {
-            startupScope.launch {
-                // Never leave the Android splash screen up forever if a cached
-                // repository or local database stalls during startup.
-                val preloadCompleted = runCatching {
+        startupScope.launch {
+            // Never leave the Android splash screen up forever if a cached
+            // repository or local database stalls during startup.
+            val preloadCompleted = if (StartupPreloader.isComplete) {
+                true
+            } else {
+                runCatching {
                     withTimeoutOrNull(12_000L) {
                         StartupPreloader.awaitReady()
                         true
@@ -214,15 +215,45 @@ open class MainActivity : AppCompatActivity() {
                         "startup preload failed: ${error::class.simpleName}: ${error.message}",
                     )
                 }.getOrDefault(false)
+            }
 
-                if (!preloadCompleted) {
-                    InAppLogger.warn(
-                        "App/Startup",
-                        "showing app after startup preload timeout or failure",
-                    )
-                }
+            if (!preloadCompleted) {
+                InAppLogger.warn(
+                    "App/Startup",
+                    "showing app after startup preload timeout or failure",
+                )
+            }
+            if (!isFinishing && !isDestroyed) {
+                runCatching { applyBundledDefaultsOnFreshInstall() }
+                    .onFailure { error ->
+                        InAppLogger.warn(
+                            "App/Startup",
+                            "bundled defaults import failed: ${error::class.simpleName}: ${error.message}",
+                        )
+                    }
                 if (!isFinishing && !isDestroyed) showContent()
             }
+        }
+    }
+
+
+    private suspend fun applyBundledDefaultsOnFreshInstall() {
+        val preferences = getSharedPreferences("swag_initial_defaults", MODE_PRIVATE)
+        if (preferences.getBoolean("applied", false)) return
+
+        val packageInfo = packageManager.getPackageInfo(packageName, 0)
+        if (packageInfo.firstInstallTime != packageInfo.lastUpdateTime) {
+            // Existing installations keep their own settings when updating.
+            preferences.edit().putBoolean("applied", true).apply()
+            return
+        }
+
+        val bundledConfig = assets.open("swag-default-settings.json").bufferedReader().use { it.readText() }
+        if (SettingsConfigTransfer.importBundledDefaults(bundledConfig)) {
+            preferences.edit().putBoolean("applied", true).apply()
+            InAppLogger.info("App/Startup", "bundled default settings applied")
+        } else {
+            InAppLogger.warn("App/Startup", "bundled default settings were not fully applied; will retry next launch")
         }
     }
 
