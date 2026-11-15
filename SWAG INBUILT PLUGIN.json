@@ -1,0 +1,557 @@
+{
+    "format": "nuvio_settings_config",
+    "version": 1,
+    "app_version": "0.6.12-beta",
+    "exported_at": "2026-11-15T05:32:46.282Z",
+    "includes_sensitive_data": true,
+    "settings": {
+        "theme": {
+            "amoled_enabled": {
+                "type": "boolean",
+                "value": true
+            },
+            "dynamic_artwork_background_enabled": {
+                "type": "boolean",
+                "value": false
+            },
+            "show_catalog_accent_enabled": {
+                "type": "boolean",
+                "value": true
+            },
+            "nav_bar_style": {
+                "type": "string",
+                "value": "expanded"
+            },
+            "nav_bar_glow_enabled": {
+                "type": "boolean",
+                "value": true
+            },
+            "nav_bar_default_icon_color_enabled": {
+                "type": "boolean",
+                "value": false
+            },
+            "nav_bar_default_icon_color": {
+                "type": "string",
+                "value": "#FFFFFF"
+            },
+            "nav_bar_liquid_glass_bar_effects": {
+                "type": "string",
+                "value": "{\"cornerRadiusPercent\":50.0,\"blurRadiusDp\":10.0,\"refractionHeightDp\":33.0,\"refractionAmountDp\":26.0,\"chromaticAberration\":true,\"depthEffect\":true,\"tintOpacity\":0.4}"
+            },
+            "nav_bar_liquid_glass_selection_effects": {
+                "type": "string",
+                "value": "{\"cornerRadiusPercent\":50.0,\"blurRadiusDp\":13.0,\"refractionHeightDp\":12.0,\"refractionAmountDp\":20.0,\"chromaticAberration\":true,\"depthEffect\":true,\"tintOpacity\":0.0,\"affectTabIcons\":true,\"affectFloatingBar\":true}"
+            },
+            "nav_bar_glass": {
+                "type": "string",
+                "value": "2;clear;1;1;1;1"
+            }
+        },
+        "poster_card_style": "{\"widthDp\":140,\"heightDp\":210,\"cornerRadiusDp\":16,\"catalogLandscapeModeEnabled\":false,\"hideLabelsEnabled\":false,\"alwaysShowLandscapeClearlogo\":true}",
+        "custom_poster": {
+            "pattern": ""
+        },
+        "card_depth_style": "{\"enabled\":true,\"edgeStrength\":70,\"sheenStrength\":25,\"edgeCoverage\":0,\"postersEnabled\":true,\"continueWatchingEnabled\":true,\"episodeCardsEnabled\":true,\"castEnabled\":true,\"trailersEnabled\":true}",
+        "player": {
+            "resize_mode": {
+                "type": "string",
+                "value": "Fit"
+            },
+            "subtitle_text_color": {
+                "type": "string",
+                "value": "#CCFFFFFF"
+            },
+            "subtitle_background_color": {
+                "type": "string",
+                "value": "#00000000"
+            },
+            "subtitle_outline_color": {
+                "type": "string",
+                "value": "#FF000000"
+            },
+            "subtitle_outline_enabled": {
+                "type": "boolean",
+                "value": false
+            },
+            "subtitle_outline_width": {
+                "type": "int",
+                "value": 2
+            },
+            "subtitle_appearance": {
+                "type": "string",
+                "value": "{\"fontId\":\"serif\"}"
+            },
+            "subtitle_bold": {
+                "type": "boolean",
+                "value": true
+            },
+            "subtitle_font_size_sp": {
+                "type": "int",
+                "value": 18
+            },
+            "subtitle_bottom_offset": {
+                "type": "int",
+                "value": 20
+            },
+            "subtitle_strip_sdh": {
+                "type": "boolean",
+                "value": false
+            },
+            "subtitle_use_forced_subtitles": {
+                "type": "boolean",
+                "value": true
+            },
+            "subtitle_show_only_preferred_languages": {
+                "type": "boolean",
+                "value": false
+            }
+        },
+        "subtitle_auto_sync": {
+            "start_on_playback": true,
+            "aggressive_mode": true,
+            "tolerance_ms": 0
+        },
+        "stream_badges": {
+            "stream_background_mode": {
+                "type": "string",
+                "value": "cinematic"
+            }
+        },
+        "debrid": {},
+        "tmdb": {},
+        "mdblist": {},
+        "omdb": {},
+        "meta_screen": "{\"items\":[{\"key\":\"ACTIONS\",\"enabled\":true,\"order\":0,\"tabGroup\":null},{\"key\":\"OVERVIEW\",\"enabled\":true,\"order\":1,\"tabGroup\":null},{\"key\":\"PRODUCTION\",\"enabled\":true,\"order\":2,\"tabGroup\":null},{\"key\":\"CAST\",\"enabled\":true,\"order\":3,\"tabGroup\":null},{\"key\":\"COMMENTS\",\"enabled\":true,\"order\":4,\"tabGroup\":null},{\"key\":\"TRAILERS\",\"enabled\":true,\"order\":5,\"tabGroup\":null},{\"key\":\"EPISODES\",\"enabled\":true,\"order\":6,\"tabGroup\":null},{\"key\":\"DETAILS\",\"enabled\":true,\"order\":7,\"tabGroup\":null},{\"key\":\"COLLECTION\",\"enabled\":true,\"order\":8,\"tabGroup\":null},{\"key\":\"MORE_LIKE_THIS\",\"enabled\":true,\"order\":9,\"tabGroup\":null}],\"background_mode\":\"normal\",\"cinematicBackground\":false,\"hero_trailer_playback\":false,\"hero_trailer_start_delay_seconds\":0,\"heroTrailerStartUnmuted\":false,\"iconActionRow\":true,\"tvStyleLayout\":false,\"episodeCardStyle\":\"horizontal\",\"blur_unwatched_episodes\":false,\"poster_transition_enabled\":false,\"show_overall_ratings\":true,\"episode_ratings_visibility\":\"SHOW_ALL\",\"show_rating_map\":true}",
+        "details": {
+            "episode_shuffle_available": false
+        },
+        "continue_watching": "",
+        "library_display": "",
+        "home": {
+            "hero_enabled": true,
+            "hero_style": "full_bleed",
+            "hero_trailer_playback_enabled": true,
+            "hero_trailer_start_delay_seconds": 0,
+            "hero_trailer_start_unmuted": false,
+            "hero_sources": [
+                "com.nuvio.tmdb.catalogs:movie:trending-movies",
+                "com.nuvio.tmdb.catalogs:series:trending-series"
+            ],
+            "catalogs": {
+                "show_catalog_type": true,
+                "hide_unreleased_content": false,
+                "items": [
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "trending-movies",
+                        "enabled": true,
+                        "order": 0,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:trending-movies"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "trending-series",
+                        "enabled": true,
+                        "order": 1,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:trending-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "popular-movies",
+                        "enabled": true,
+                        "order": 2,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:popular-movies"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "popular-series",
+                        "enabled": true,
+                        "order": 3,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:popular-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "airing-today-series",
+                        "enabled": true,
+                        "order": 4,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:airing-today-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "critically-acclaimed-movies",
+                        "enabled": true,
+                        "order": 5,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:critically-acclaimed-movies"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "critically-acclaimed-series",
+                        "enabled": true,
+                        "order": 6,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:critically-acclaimed-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "new-and-upcoming-movies",
+                        "enabled": true,
+                        "order": 7,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:new-and-upcoming-movies"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "new-and-returning-series",
+                        "enabled": true,
+                        "order": 8,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:new-and-returning-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "movies-by-year",
+                        "enabled": true,
+                        "order": 9,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:movies-by-year"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "series-by-year",
+                        "enabled": true,
+                        "order": 10,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:series-by-year"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "movies-by-language",
+                        "enabled": true,
+                        "order": 11,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:movies-by-language"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "series-by-language",
+                        "enabled": true,
+                        "order": 12,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:series-by-language"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "netflix-movies",
+                        "enabled": true,
+                        "order": 13,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:netflix-movies"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "netflix-series",
+                        "enabled": true,
+                        "order": 14,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:netflix-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "disney-plus-movies",
+                        "enabled": true,
+                        "order": 15,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:disney-plus-movies"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "disney-plus-series",
+                        "enabled": true,
+                        "order": 16,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:disney-plus-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "prime-video-movies",
+                        "enabled": true,
+                        "order": 17,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:prime-video-movies"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "prime-video-series",
+                        "enabled": true,
+                        "order": 18,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:prime-video-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "international-cinema",
+                        "enabled": true,
+                        "order": 19,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:international-cinema"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "international-series",
+                        "enabled": true,
+                        "order": 20,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:international-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "independent-and-festival-picks",
+                        "enabled": true,
+                        "order": 21,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:independent-and-festival-picks"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "limited-series",
+                        "enabled": true,
+                        "order": 22,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:limited-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "documentaries",
+                        "enabled": true,
+                        "order": 23,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:documentaries"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "documentary-series",
+                        "enabled": true,
+                        "order": 24,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:documentary-series"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "movie",
+                        "catalog_id": "family-movies",
+                        "enabled": true,
+                        "order": 25,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:movie:family-movies"
+                    },
+                    {
+                        "addon_id": "com.nuvio.tmdb.catalogs",
+                        "type": "series",
+                        "catalog_id": "family-series",
+                        "enabled": true,
+                        "order": 26,
+                        "custom_title": "",
+                        "is_collection": false,
+                        "collection_id": "",
+                        "key": "com.nuvio.tmdb.catalogs:series:family-series"
+                    }
+                ]
+            }
+        },
+        "general": {
+            "episode_release_alerts_enabled": false,
+            "allow_mobile_data_downloads": false,
+            "show_download_button": true,
+            "search_history_enabled": true,
+            "dns_provider": "cloudflare",
+            "update_channel": "beta"
+        },
+        "p2p": {},
+        "discord_rpc": {
+            "enabled": false,
+            "activity_type": 3,
+            "status": "online",
+            "show_title_as_name": false,
+            "show_poster": true,
+            "show_playback_state": true,
+            "show_timestamps": true,
+            "hide_on_pause": false,
+            "show_imdb_button": true,
+            "application_id": ""
+        },
+        "live_tv": {
+            "navigation_enabled": true,
+            "epg_auto_detect_enabled": true,
+            "playlists": [],
+            "epg_sources": []
+        },
+        "addons": [
+            {
+                "url": "https://catalog.nuvio.tv/manifest.json",
+                "enabled": true
+            },
+            {
+                "url": "https://opensubtitles-v3.strem.io/manifest.json",
+                "enabled": true
+            }
+        ],
+        "plugins": {
+            "plugins_enabled": true,
+            "group_streams_by_repository": false,
+            "repositories": [
+                "https://raw.githubusercontent.com/D3adlyRocket/All-in-One-Nuvio/refs/heads/main/manifest.json"
+            ],
+            "scrapers": {
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:allanime": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:4khdhub": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:1shows": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:allwish": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:animekai": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:anizone": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:anikototv": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:anidb": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:animepahe": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:animesalt": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:animedekho": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:animetsu": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:animeworld": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:anime-sama": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:allmovieland": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:animezey": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:desiflix": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:castle": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:Cineby": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:cinefreak": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:moonflix": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:cinemacity": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:ctgmovies": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:dahmermovies": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:dahmermovies-tv": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:dooflix": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:einthusan": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:fibwatch": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:goated": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:gramcinema": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:hdghartv": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:hdhub4u": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:hianime": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:hindmoviez": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:kurage": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:moviebox": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:movieblast": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:moviesdrive": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:moviesmod": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:movieshunt": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:movies4u": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:movix": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:nakios": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:netmirror": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:persianstremio": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:peachify": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:playimdb": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:purstream": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:showbox": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:topcartoons": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:torrentio": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:vidrock": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:uhdmovies": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:vegamovies": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:vidlink": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:videasy": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:vidsrc": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:vixsrc": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:vidfast": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:vidlove": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:xpass": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:zinkmovies": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:onlykdrama": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:kisskh": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:reanime": true,
+                "https://raw.githubusercontent.com/d3adlyrocket/all-in-one-nuvio/refs/heads/main/manifest.json:mapple": true
+            }
+        }
+    }
+}
