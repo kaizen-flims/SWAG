@@ -107,8 +107,30 @@ jobs:
           EOF
           chmod 600 app/local.properties
 
+      - name: Verify Nuvio backend configuration
+        env:
+          NUVIO_SUPABASE_URL: ${{ secrets.NUVIO_SUPABASE_URL }}
+          NUVIO_SUPABASE_ANON_KEY: ${{ secrets.NUVIO_SUPABASE_ANON_KEY }}
+          NUVIO_SUPABASE_FALLBACK_URL: ${{ secrets.NUVIO_SUPABASE_FALLBACK_URL }}
+        run: |
+          set -euo pipefail
+          for name in NUVIO_SUPABASE_URL NUVIO_SUPABASE_ANON_KEY; do
+            if [ -z "${!name:-}" ]; then
+              echo "Required GitHub Actions secret is missing: $name" >&2
+              exit 1
+            fi
+          done
+          case "$NUVIO_SUPABASE_URL" in
+            https://*) ;;
+            *) echo "NUVIO_SUPABASE_URL must use HTTPS." >&2; exit 1 ;;
+          esac
+
       - name: Build #SWAG universal signed release APK only
         working-directory: app
+        env:
+          NUVIO_SUPABASE_URL: ${{ secrets.NUVIO_SUPABASE_URL }}
+          NUVIO_SUPABASE_ANON_KEY: ${{ secrets.NUVIO_SUPABASE_ANON_KEY }}
+          NUVIO_SUPABASE_FALLBACK_URL: ${{ secrets.NUVIO_SUPABASE_FALLBACK_URL }}
         run: ./gradlew --no-daemon :androidApp:assembleFullRelease
 
       - name: Verify the single universal release APK
