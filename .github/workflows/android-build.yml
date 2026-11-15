@@ -66,6 +66,9 @@ jobs:
           python -m pip install --disable-pip-version-check cairosvg pillow
           python scripts/generate-android-icons.py
 
+      - name: Audit legacy-named Kotlin declarations
+        run: python3 scripts/audit-obsolete-kotlin.py
+
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v6
 
