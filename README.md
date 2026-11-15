@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/icon.svg" width="200" alt="#SWAG logo" />
+</p>
+
 # #SWAG Workstation
 
 The active Android development workspace for #SWAG. All application changes and workstation-owned GitHub Actions workflows are maintained here. The original `kaizen-flims/SWAG` repository remains untouched until a reviewed version is ready to publish.
