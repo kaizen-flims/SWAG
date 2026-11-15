@@ -1,30 +1,36 @@
-<p align="center">
+ <p align="center">
   <img src="assets/icon.svg" width="200" alt="#SWAG logo" />
 </p>
 
-# #SWAG Workstation
+# #SWAG
 
-The active Android development workspace for #SWAG. All application changes and workstation-owned GitHub Actions workflows are maintained here. The original `kaizen-flims/SWAG` repository remains untouched until a reviewed version is ready to publish.
+**An independent Android app project.**
 
-## Repository layout
+This is the official #SWAG repository. It contains the Android application source, project assets, build automation, and the resources required to develop and build #SWAG.
 
-- `app/`: Android application source and build project.
-- `archives/nuvio-mobile-enhanced/`: original source archive parts, preserved unchanged.
-- `assets/icon.svg`: canonical #SWAG logo and wordmark supplied for the rebrand.
-- `assets/incoming/`: original imported asset staging area.
-- `.github/workflows/`: workstation automation.
+## Project structure
 
-## Upstream acknowledgements
+- `app/`: Android application source and Gradle build project.
+- `archives/nuvio-mobile-enhanced/`: preserved upstream source archive.
+- `assets/icon.svg`: official #SWAG logo and wordmark.
+- `assets/incoming/`: imported source assets.
+- `.github/workflows/`: GitHub Actions workflows.
 
-#SWAG is based on source from **Nuvio Mobile** and **Nuvio Mobile Enhanced**. Their original work and required license notices are retained in the source tree. #SWAG is an independent rebrand and is not affiliated with or endorsed by the Nuvio team.
+## Building from source
 
-The upstream source is licensed under GNU GPL v3.0. See `app/LICENSE` and the preserved third-party notices for the applicable terms.
+### Requirements
 
-## Local Android setup
+- JDK 17
+- Android SDK Platform 37.1
+- Android Build Tools 37.0.0
+- CMake 3.22.1
+- Android NDK selected by the Android Gradle Plugin
+- Rust stable and `cargo-ndk`
+- Python 3 with `cairosvg` and `Pillow`
 
-Requirements: JDK 17, Android SDK Platform 37.1, Build Tools 37.0.0, CMake 3.22.1, an Android NDK selected by the Android Gradle Plugin, Rust stable, `cargo-ndk`, and Python packages `cairosvg` and `Pillow` for generating Android branding assets.
+### Prepare dependencies and branding assets
 
-From the repository root, restore the pinned upstream Android libraries (the binary AARs are intentionally not committed here):
+From the repository root:
 
 ```bash
 bash scripts/restore-android-libs.sh
@@ -34,18 +40,23 @@ rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-andro
 cargo install cargo-ndk --locked
 ```
 
-Then build the full Android debug APK:
+The restore script validates the required Android AAR files before placing them in `app/composeApp/libs`. It uses a pinned upstream source revision to keep dependency restoration reproducible.
+
+### Build a debug APK
 
 ```bash
 cd app
 ./gradlew --no-daemon :androidApp:assembleFullDebug
 ```
 
-The restore script validates every required AAR before placing it in `app/composeApp/libs`. It uses a pinned upstream source revision so workstation builds do not silently drift when upstream changes.
+## Upstream acknowledgements and licensing
 
-## Development rules
+#SWAG is an independent rebrand based on source from **Nuvio Mobile** and **Nuvio Mobile Enhanced**. Their original work, required attribution, and license notices are retained in the source tree. #SWAG is not affiliated with or endorsed by the Nuvio team.
 
-- Keep existing backend behavior, authentication, and service endpoints unchanged unless explicitly requested.
-- Make and verify changes in this workstation repository.
-- Keep upstream attribution and license notices intact.
-- Android is the active target in this workstation; iOS project and build targets have been removed.
+The upstream source is licensed under **GNU General Public License v3.0**. Refer to `app/LICENSE` and the preserved third-party notices for the applicable license terms.
+
+## Project notes
+
+- Existing backend behavior, authentication, and service endpoints should remain intact unless a change is explicitly intended.
+- Preserve upstream attribution and applicable license notices when modifying or redistributing the project.
+- Android is the active development and release target. iOS project and build targets have been removed.
