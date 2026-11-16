@@ -1,0 +1,31 @@
+name: Migrate SWAG Website Branch
+
+on:
+  push:
+    paths:
+      - '.github/workflows/migrate-website.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SWAG repository
+        uses: actions/checkout@v4
+
+      - name: Clone SWAG-WEBSITE and push to website branch
+        run: |
+          git clone --depth=1 https://github.com/kaizen-flims/SWAG-WEBSITE /tmp/site
+          rm -rf /tmp/site/.git /tmp/site/.github
+          git checkout --orphan website
+          git rm -rf .
+          cp -r /tmp/site/. .
+          touch .nojekyll
+          git config user.name "kaizen-flims"
+          git config user.email "kaizen-flims@users.noreply.github.com"
+          git add -A
+          git commit -m "feat: migrate official #SWAG website to website branch"
+          git push -f origin website
