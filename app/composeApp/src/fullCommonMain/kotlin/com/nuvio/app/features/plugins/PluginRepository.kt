@@ -611,9 +611,7 @@ actual object PluginRepository {
         if (defaultRepositorySeedJob?.isActive == true) return
 
         defaultRepositorySeedJob = scope.launch {
-            val authState = AuthRepository.state.first { it !is AuthState.Loading }
             if (profileId != currentProfileId || defaultRepositorySeeded) return@launch
-            if (authState is AuthState.Authenticated && !authState.isAnonymous) return@launch
             ensureDefaultRepositoryInstalled(profileId)
         }
     }
