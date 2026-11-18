@@ -444,6 +444,12 @@ kotlin {
     }
 }
 
+androidComponents {
+    onVariants { variant ->
+        variant.sources.assets?.addStaticSourceDirectory("src/androidMain/assets")
+    }
+}
+
 configurations.all {
     exclude(group = "androidx.media3", module = "media3-exoplayer")
     exclude(group = "androidx.media3", module = "media3-ui")
