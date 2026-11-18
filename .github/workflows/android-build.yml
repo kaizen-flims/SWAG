@@ -155,6 +155,21 @@ jobs:
           fi
           "$APKSIGNER" verify --verbose "$APK"
 
+          if ! unzip -l "$APK" | grep -qE '[[:space:]]assets/swag-default-settings\.json
+      # Emulator smoke tests are intentionally opt-in. Re-enable when investigating a runtime regression.
+
+      - name: Upload the universal signed release APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: swag-universal-release
+          path: app/androidApp/build/outputs/apk/full/release/androidApp-full-release.apk
+          if-no-files-found: error
+          retention-days: 30
+; then
+            echo "Bundled SWAG default settings JSON is missing from the APK." >&2
+            exit 1
+          fi
+
       # Emulator smoke tests are intentionally opt-in. Re-enable when investigating a runtime regression.
 
       - name: Upload the universal signed release APK
